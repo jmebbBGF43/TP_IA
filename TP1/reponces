@@ -1,0 +1,6 @@
+1. Examinez le code de solve() et de StackFrontier. La méthode de recherche codée correspond-elle
+à un parcours en profondeur ou en largeur ?
+
+    c'est un parcours en profondeur qui est fait dans la médode actuellement, on peut avoir ça notemant dans le métode
+    remove de StackFrontire ou on supprimer le dernier élément à chaques supressions
+

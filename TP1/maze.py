@@ -1,4 +1,18 @@
 import sys
+import argparse
+
+parser = argparse.ArgumentParser(prog='maze', conflict_handler='resolve')
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument('-d', '--depthfirst', action='store_true', help='use depth-first search method')
+group.add_argument('-b', '--breadthfirst', action='store_true',help='use breadth-first search method')
+group.add_argument('-a', '--astar', action='store_true', help='use A* search method')
+parser.add_argument('filename', help='path to maze file')
+args = parser.parse_args()
+parser.print_help()
+
+class Node():
+    def __init__(self, state=None, parent=None, action=None):
+        self.state = state
 
 class Node():
     def __init__(self, state, parent, action):
@@ -20,6 +34,11 @@ class StackFrontier():
     def empty(self):
         return len(self.frontier) == 0
 
+
+class DepthfirstStackFrontier(StackFrontier):
+    def __init__(self):
+        super().__init__()
+
     def remove(self):
         if self.empty():
             raise Exception("empty frontier")
@@ -29,6 +48,29 @@ class StackFrontier():
             return node
 
 
+class BreadthfirstStackFrontier(StackFrontier):
+    def __init__(self):
+        super().__init__()
+
+    def remove(self):
+        if self.empty():
+            raise Exception("empty frontier")
+        else:
+            node = self.frontier[0]
+            self.frontier = self.frontier[1:]
+            return node
+
+class AstarStackFrontier(StackFrontier):
+    def __init__(self):
+        super().__init__()
+
+    def remove(self):
+        if self.empty():
+            raise Exception("empty frontier")
+        else:
+            node = self.frontier[0]
+            self.frontier = self.frontier[0:]
+            return node
 class Maze():
 
     def __init__(self, filename):
@@ -114,7 +156,7 @@ class Maze():
 
         # Initialize frontier to just the starting position
         start = Node(state=self.start, parent=None, action=None)
-        frontier = StackFrontier()
+        frontier = BreadthfirstStackFrontier() if args.breadthfirst is True else DepthfirstStackFrontier() if args.depthfirst is True else StackFrontier()
         frontier.add(start)
 
         # Initialize an empty explored set
@@ -204,11 +246,10 @@ class Maze():
 
         img.save(filename)
 
+#if len(sys.argv) != 2:
+#    sys.exit("Usage: python maze.py maze.txt")
 
-if len(sys.argv) != 2:
-    sys.exit("Usage: python maze.py maze.txt")
-
-m = Maze(sys.argv[1])
+m = Maze(args.filename) #m = Maze(sys.argv[1])
 print("Maze:")
 m.print()
 print("Solving...")

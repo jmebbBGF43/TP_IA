@@ -1,0 +1,9 @@
+### configuration de l'environnement ###
+conda create --name init-IA
+conda init
+bash
+
+### configuration spécifique au TP ###
+conda activate init-IA # Cette commande sera à faire en début de chaque séance de TP
+conda install -c conda-forge mamba
+conda install pillow 
