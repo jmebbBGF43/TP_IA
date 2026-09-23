@@ -11,15 +11,16 @@ args = parser.parse_args()
 parser.print_help()
 
 class Node():
-    def __init__(self, state=None, parent=None, action=None):
-        self.state = state
-
-class Node():
     def __init__(self, state, parent, action):
         self.state = state
         self.parent = parent
         self.action = action
 
+class NodePriority(Node):
+    def __init__(self, state, parent, action, cost, value):
+        self.cost = cost
+        self.value = value
+        super().__init__(state=state, parent=parent, action=action)
 
 class StackFrontier():
     def __init__(self):
@@ -60,17 +61,23 @@ class BreadthfirstStackFrontier(StackFrontier):
             self.frontier = self.frontier[1:]
             return node
 
-class AstarStackFrontier(StackFrontier):
+class PriorityQueueFrontier(StackFrontier):
     def __init__(self):
         super().__init__()
+
+    def get_min_value(self):
+        return (nodemin(node.value for node in self.frontier))
 
     def remove(self):
         if self.empty():
             raise Exception("empty frontier")
         else:
-            node = self.frontier[0]
-            self.frontier = self.frontier[0:]
-            return node
+            nodeindex = 0
+            for i in range(len(self.frontier)):
+                if self.frontier[i].value <= self.frontier[nodeindex].value:
+                    nodeindex = i
+            return self.frontier.pop(nodeindex)
+
 class Maze():
 
     def __init__(self, filename):
@@ -112,6 +119,10 @@ class Maze():
 
         self.solution = None
 
+    def heuristique(self, state):
+        xn, yn = state
+        xb, yb = self.goal
+        return abs(xb - xn) + abs(yb - yn)
 
     def print(self):
         solution = self.solution[1] if self.solution is not None else None
@@ -155,8 +166,11 @@ class Maze():
         self.num_explored = 0
 
         # Initialize frontier to just the starting position
-        start = Node(state=self.start, parent=None, action=None)
-        frontier = BreadthfirstStackFrontier() if args.breadthfirst is True else DepthfirstStackFrontier() if args.depthfirst is True else StackFrontier()
+        if args.astar :
+            start = NodePriority(state=self.start, parent=None, action=None, cost=0, value=self.heuristique(self.start))
+        else :
+            start = Node(state=self.start, parent=None, action=None)
+        frontier = BreadthfirstStackFrontier() if args.breadthfirst is True else DepthfirstStackFrontier() if args.depthfirst is True else PriorityQueueFrontier() if args.astar is True else AstarFrontier() if args.astar is True else DepthfirstStackFrontier()
         frontier.add(start)
 
         # Initialize an empty explored set
@@ -170,7 +184,10 @@ class Maze():
                 raise Exception("no solution")
 
             # Choose a node from the frontier
-            node = frontier.remove()
+            if args.astar :
+                node = frontier.remove()
+            else :
+                node = frontier.remove()
             self.num_explored += 1
 
             # If node is the goal, then we have a solution
@@ -192,7 +209,10 @@ class Maze():
             # Add neighbors to frontier
             for action, state in self.neighbors(node.state):
                 if not frontier.contains_state(state) and state not in self.explored:
-                    child = Node(state=state, parent=node, action=action)
+                    if args.astar :
+                        child = NodePriority(state=state, parent=node, action=action, cost=node.cost+1, value=self.heuristique(state))
+                    else:
+                        child = Node(state=state, parent=node, action=action)
                     frontier.add(child)
 
 

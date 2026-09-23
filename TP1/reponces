@@ -4,3 +4,9 @@
     c'est un parcours en profondeur qui est fait dans la médode actuellement, on peut avoir ça notemant dans le métode
     remove de StackFrontire ou on supprimer le dernier élément à chaques supressions
 
+1. Exécutez les trois algorithmes de recherche de solution sur chacun des cinq labyrinthes fournis.
+Comparez les nombres de chemins explorés.
+en moyenne et par rapport au deux autres algorythmes les chemin exploré sont moins nombreux et vont moins loin quand il s'aggits d'allez dans une impasse
+
+2. Les solutions trouvées sont-elles optimales ?
+oui toutes les solutiosn trouvé sont optimal
