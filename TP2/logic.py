@@ -260,8 +260,7 @@ class Biconditional(Sentence):
 
 def rm_biconditionals(proposition):
     """Replace biconditionals with implications"""
-    raise NotImplementedError
-    # TODO
+    return proposition.symbole()
 
 def rm_implications(proposition):
     """Replace implications A=>B with the rule ¬A∨B"""
@@ -382,8 +381,10 @@ def resolve(c1,c2):
 def resolution_inference(knowledge, query):
     """Apply inference rules and resolution to prove knowledge base entails query."""
     """Return True if knowledge base entails query; False otherwise"""
-    raise NotImplementedError
-    # TODO
+    clauses = []
+    while True:
+        new_clause = []
+        for ci, cj in clauses:
 
 def model_check(knowledge, query):
     """Checks if knowledge base entails query."""

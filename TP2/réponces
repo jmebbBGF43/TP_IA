@@ -1,0 +1,38 @@
+ Découverte du code fourni
+
+ 1. D’après l’examen du programme, combien de symboles de propositions sont-ils définis ? Combien de phrases la base de connaissances contient-elle ?
+ il y a 3 symbole de position. On a 3 set d'information de base, Initial cards, Unknow card ,Knowcard
+
+2. Après exécution du programme avec la méthode de vérification de modèles (model checking),
+quelle est la combinaison de cartes trouvées satisfaisant la base de connaissance
+MsScarlet: YES
+library: YES
+knife: YES
+
+
+Résolution d’énigmes
+
+À partir de l’expression de chacune des énigmes en logique de proposition et en utilisant votre
+programme, énumérez les solutions trouvées.
+
+Enigme 1
+    A est un chevalier
+    B est un valet
+Enigme 2
+    A est un valet
+    B est un chevalier
+Enigme 3
+    A est un chevalier
+    B est un valet
+    C est un chevalier
+Enigme 4
+    A est un chevalier
+    B est un valet
+    C est un chevalier
+
+
+Mise en œuvre de la résolution
+
+Même si les fonctions les plus complexes vous sont données, cette partie reste la plus longue
+du TP. Précisez clairement les fonctions dont vous avez pu tester le fonctionnement.
+
