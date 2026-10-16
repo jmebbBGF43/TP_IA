@@ -260,17 +260,36 @@ class Biconditional(Sentence):
 
 def rm_biconditionals(proposition):
     """Replace biconditionals with implications"""
-    return proposition.symbole()
+    if(isinstance(proposition, Biconditional)):
+        left = Implication(proposition.left, proposition.right)
+        right = IMplication(proposition.right, proposition.left)
+        return And(left, right)
+    return 0
 
 def rm_implications(proposition):
     """Replace implications A=>B with the rule ¬A∨B"""
-    raise NotImplementedError
-    # TODO
+    if(isinstance(proposition, Implication)):
+        return And(Not(proposition.antecedent), proposition.consequent)
+    return 0
 
 def mv_not(proposition):
     """move negations inside with de Morgan rules and remove double negations"""
-    raise NotImplementedError
-    # TODO
+    if isinstance(proposition, Not):
+        operand = proposition.operand
+        if isinstance(operand, Not):
+            return mv_not(operand.operand)
+        elif isinstance(operand, And):
+            return Or(*[mv_not(Not(c)) for c in operand.conjuncts])
+        elif isinstance(operand, Or):
+            return And(*[mv_not(Not(d)) for d in operand.disjuncts])
+        else:
+            return proposition
+    elif isinstance(proposition, And):
+        return And(*[mv_not(c) for c in proposition.conjuncts])
+    elif isinstance(proposition, Or):
+        return Or(*[mv_not(d) for d in proposition.disjuncts])
+    else:
+        return proposition
 
 def flatten(proposition):
     """ flatten proposition, e.g. A∨(B∨C) becomes A∨B∨C"""
@@ -325,12 +344,30 @@ def apply_distribution(proposition):
     else:
         # not or litterals
         return proposition
-    
+
 
 def convert_to_CNF(proposition):
     """Convert proposition into Conjonctive Normal Form"""
-    raise NotImplementedError
-    # TODO
+    def remove_arrows(prop):
+        if isinstance(prop, Biconditional):
+            left = remove_arrows(prop.left)
+            right = remove_arrows(prop.right)
+            return And(Or(Not(left), right), Or(Not(right), left))
+        elif isinstance(prop, Implication):
+            return Or(Not(remove_arrows(prop.antecedent)), remove_arrows(prop.consequent))
+        elif isinstance(prop, And):
+            return And(*[remove_arrows(c) for c in prop.conjuncts])
+        elif isinstance(prop, Or):
+            return Or(*[remove_arrows(d) for d in prop.disjuncts])
+        elif isinstance(prop, Not):
+            return Not(remove_arrows(prop.operand))
+        else:
+            return prop
+    prop = remove_arrows(proposition)
+    prop = mv_not(prop)
+    prop = flatten(prop)
+    prop = apply_distribution(prop)
+    return flatten(prop)
 
 def resolve(c1,c2):
     """apply resolution inference to two clauses"""
@@ -380,11 +417,26 @@ def resolve(c1,c2):
 
 def resolution_inference(knowledge, query):
     """Apply inference rules and resolution to prove knowledge base entails query."""
-    """Return True if knowledge base entails query; False otherwise"""
-    clauses = []
+    cnf_formula = convert_to_CNF(And(knowledge, Not(query)))
+    if isinstance(cnf_formula, And):
+        clauses = cnf_formula.conjuncts
+    else:
+        clauses = [cnf_formula]
+    clauses = list(set(clauses))
     while True:
-        new_clause = []
-        for ci, cj in clauses:
+        new_clauses = []
+        n = len(clauses)
+        for i in range(n):
+            for j in range(i + 1, n):
+                resolvents = resolve(clauses[i], clauses[j])
+                if Empty() in resolvents:
+                    return True
+                for res in resolvents:
+                    if res not in new_clauses and res not in clauses:
+                        new_clauses.append(res)
+        if not new_clauses:
+            return False
+        clauses.extend(new_clauses)
 
 def model_check(knowledge, query):
     """Checks if knowledge base entails query."""
